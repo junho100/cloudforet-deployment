@@ -1,0 +1,12 @@
+tasks:
+  - name: Create Managed Repository
+    id: managed_repository
+    uses: "@modules/resource"
+    spec:
+      resource_type: repository.Repository
+      data:
+        name: Managed Repository
+        repository_type: managed
+      mode: EXEC
+      verb:
+        exec: register

@@ -1,0 +1,194 @@
+###############################
+# DEFAULT 
+###############################
+enabled: true
+developer: false
+grpc: true
+scheduler: false
+worker: false
+rest: false
+name: inventory
+replicas: 1
+image:
+    name: spaceone/inventory
+    version: latest
+imagePullPolicy: IfNotPresent
+
+resources: {}
+#     grpc: 
+#         requests:
+#             memory: "128Mi"
+#             cpu: "25m"
+#         limits:
+#             memory: "256Mi"
+#             cpu: "50m"
+#     rest: 
+#         requests:
+#             memory: "128Mi"
+#             cpu: "25m"
+#         limits:
+#             memory: "256Mi"
+#             cpu: "50m"
+#     scheduler: 
+#         requests:
+#             memory: "128Mi"
+#             cpu: "25m"
+#         limits:
+#             memory: "256Mi"
+#             cpu: "50m"
+#     worker: 
+#         requests:
+#             memory: "128Mi"
+#             cpu: "25m"
+#         limits:
+#             memory: "256Mi"
+#             cpu: "50m"
+
+# Overwrite database
+database: {}
+
+# Overwrite application config
+application: {}
+
+# Overwrite scheduler config
+#application_scheduler: {}
+application_scheduler: 
+    QUEUES:
+        collector_q:
+            backend: spaceone.core.queue.redis_queue.RedisQueue
+            host: redis
+            port: 6379
+            channel: collector
+
+    SCHEDULERS:
+        hourly_scheduler:
+            backend: spaceone.inventory.interface.task.v1.inventory_scheduler.InventoryHourlyScheduler
+            queue: collector_q
+            interval: 1
+            minute: ':00'
+        cleanup_scheduler:
+            backend: spaceone.inventory.interface.task.v1.cleanup_scheduler.CleanupScheduler
+            queue: collector_q
+            interval: 1
+            minute: ':35'
+        stats_scheduler:
+            backend: spaceone.inventory.interface.task.v1.cloud_service_stats_scheduler.CloudServiceStatsScheduler
+            queue: collector_q
+            interval: 1
+            minute: ':30'
+
+# Overwrite worker config
+#application_worker: {}
+application_worker:
+    QUEUES:
+        collector_q:
+            backend: spaceone.core.queue.redis_queue.RedisQueue
+            host: redis
+            port: 6379
+            channel: collector
+
+
+    WORKERS:
+        collector_worker:
+            backend: spaceone.core.scheduler.worker.BaseWorker
+            queue: collector_q
+            pool: 4
+
+application_rest: {}
+
+##########################
+# local sidecar
+##########################
+sidecar:
+    rest_web:
+        image:
+            name: nginx
+            version: stable
+            imagePullPolicy: IfNotPresent
+        resources: {}
+        #     requests:
+        #         memory: "128Mi"
+        #         cpu: "25m"
+        #     limits:
+        #         memory: "256Mi"
+        #         cpu: "50m"
+    grpc: {} 
+    rest: {}
+    scheduler: {}
+    worker: {}
+
+
+##########################
+# Local volumes
+##########################
+volumes:
+    - name: timezone
+      hostPath:
+          path: /usr/share/zoneinfo/Asia/Seoul
+    - name: log-volume
+      emptyDir: {}
+
+#######################
+# global variable
+#######################
+global:
+    shared: {}
+    sidecar: []
+#        - name: mongos
+#          image: mongo:4.4.0-bionic
+#          command: [ 'mongos', '--config', '/mnt/mongos.yml', '--bind_ip_all' ]
+#          volumeMounts:
+#            - name: mongos-conf
+#              mountPath: /mnt/mongos.yml
+#              subPath: mongos.yml
+#              readOnly: true
+#            - name: mongo-shard-key
+#              mountPath: /opt/mongos/mongo-shard.pem
+#              subPath: mongo-shard.pem
+#              readOnly: true
+#
+    volumes: []
+#        - name: mongo-shard-key
+#          secret:
+#              defaultMode: 0400
+#              secretName: mongo-shard-key
+#        - name: mongos-conf
+#          configMap:
+#              name: mongos-conf
+#        - name: shared-conf
+#          configMap:
+#              name: shared-conf
+
+    
+# Service
+service:
+    grpc:
+        type: ClusterIP
+        annotations:
+            nil: nil
+        ports:
+            - name: grpc
+              port: 50051
+              targetPort: 50051
+              protocol: TCP
+
+################################
+# volumeMount per deployment
+################################
+volumeMounts:
+    application_grpc: []
+    application_rest: []
+    application_scheduler: []
+    application_worker: []
+
+####################################
+# pod spec (append more pod spec)
+# example nodeSelect
+#
+# pod:
+#   spec:
+#     nodeSelector:
+#       application: my-node-group
+####################################
+pod:
+    spec: {}

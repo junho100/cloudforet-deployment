@@ -1,0 +1,22 @@
+###############################
+# DEFAULT 
+###############################
+enabled: true
+image:
+    name: mongo
+imagePullPolicy: IfNotPresent
+username: admin
+password: password
+service:
+    type: ClusterIP
+    ports:
+        - name: mongodb
+          port: 27017
+          targetPort: 27017
+          protocol: TCP
+pvc:
+    storageClassName: null # You must specify a storage class name. Otherwise, the mongodb pod will use empty volume.
+    accessModes: 
+        - "ReadWriteOnce"
+    requests:
+        storage: 8Gi

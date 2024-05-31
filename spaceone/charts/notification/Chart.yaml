@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 1.x.y
+description: SpaceONE notification Helm chart for Kubernetes
+name: notification
+type: application
+version: 1.3.15

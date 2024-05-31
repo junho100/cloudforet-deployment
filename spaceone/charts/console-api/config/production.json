@@ -1,0 +1,22 @@
+{
+  "cors": [
+    "http://*",
+    "https://*"
+  ],
+  "redis": {
+    "host": "redis",
+    "port": 6379,
+    "db": 15
+  },
+  "logger": {
+    "handlers": [{
+      "type": "console",
+      "level": "debug"
+    },{
+      "type": "file",
+      "level": "debug",
+      "format": "json",
+      "path": "/var/log/spaceone/console-api.log"
+    }]
+  }
+}

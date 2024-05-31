@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 1.x.y
+description: SpaceONE marketplace-assets Helm chart for Kubernetes
+name: marketplace-assets
+type: application
+version: 1.1.6

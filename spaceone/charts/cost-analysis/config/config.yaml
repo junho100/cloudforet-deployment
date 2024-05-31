@@ -1,0 +1,48 @@
+REMOTE_URL:
+- file:///opt/spaceone/cost-analysis/config/database.yaml
+- file:///opt/spaceone/cost-analysis/config/shared.yaml
+- file:///opt/spaceone/cost-analysis/config/application.yaml
+GLOBAL:
+  MAX_WORKERS: 1000
+  DATABASES:
+    default:
+      db: cost-analysis
+      host: mongodb
+      port: 27017
+      maxPoolSize: 200
+      username: cost_analysis_user
+      password: cost_analysis_password
+  CACHES:
+    default:
+      backend: spaceone.core.cache.redis_cache.RedisCache
+      host: redis
+      port: 6379
+      db: 10
+      encoding: utf-8
+      socket_timeout: 10
+      socket_connect_timeout: 10
+  LOG:
+    loggers:
+      spaceone:
+        handlers:
+          - console
+          - file
+    handlers:
+      file:
+        type: file
+        filename: /var/log/spaceone/cost_analysis.log
+  HANDLERS:
+    authentication:
+    - backend: spaceone.core.handler.authentication_handler.AuthenticationGRPCHandler
+      uri: grpc://identity:50051/v1/Domain/get_public_key
+    authorization:
+    - backend: spaceone.core.handler.authorization_handler.AuthorizationGRPCHandler
+      uri: grpc://identity:50051/v1/Authorization/verify
+    mutation:
+    - backend: spaceone.core.handler.mutation_handler.SpaceONEMutationHandler
+  QUEUES:
+    cost_analysis_q:
+      backend: spaceone.core.queue.redis_queue.RedisQueue
+      host: redis
+      port: 6379
+      channel: cost_analysis_job

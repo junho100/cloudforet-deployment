@@ -1,0 +1,79 @@
+###############################
+# DEFAULT
+###############################
+enabled: true
+image:
+  name: cloudforet/spacectl
+  version: 1.12.1
+imagePullPolicy: IfNotPresent
+
+resources: { }
+
+initContainers:
+  spaceconfig:
+    image:
+      name: busybox
+      version: latest
+      imagePullPolicy: IfNotPresent
+    resources: { }
+
+global:
+  namespace: spaceone
+#   serviceAccountName: <spaceone-admin-sa> # if not set, default will be used.
+
+skip_health_check: false
+
+#############################################################
+# INFO
+# You can select the mode to be created
+# refer to the example below.
+#############################################################
+
+#########################
+# Default: Local mode (Without Marketplace)
+#########################
+
+main:
+  import:
+    - /root/spacectl/apply/root_domain_none_consul.yaml
+    - /root/spacectl/apply/create_local_repository.yaml
+    - /root/spacectl/apply/user_domain.yaml
+    - /root/spacectl/apply/create_policy.yaml
+    - /root/spacectl/apply/create_role.yaml
+    - /root/spacectl/apply/add_statistics_schedule.yaml
+    - /root/spacectl/apply/print_api_key.yaml
+  var:
+    domain:
+      root: root
+      user: spaceone
+    default_language: ko
+    default_timezone: Asia/Seoul
+    domain_owner:
+      id: admin
+      password: Admin123!@#
+    user:
+      id: system_api_key
+
+#########################
+# Marketplace mode (with Marketplace)
+#########################
+
+#main:
+#  import:
+#    - /root/spacectl/apply/root_domain.yaml
+#    - /root/spacectl/apply/register_marketplace.yaml
+#    - /root/spacectl/apply/user_domain.yaml
+#    - /root/spacectl/apply/create_role.yaml
+#    - /root/spacectl/apply/add_statistics_schedule.yaml
+#    - /root/spacectl/apply/print_api_key.yaml
+#  var:
+#    domain:
+#      root: root
+#      user: spaceone
+#    default_language: ko
+#    default_timezone: Asia/Seoul
+#    domain_owner:
+#      id: admin
+#      password: Admin123!@#
+#    user:
+#      id: system_api_key
