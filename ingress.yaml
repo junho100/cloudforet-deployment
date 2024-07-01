@@ -1,0 +1,54 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service-1
+  namespace: cloudforet
+spec:
+  ingressClassName: custom-nginx-1
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: console
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service-2
+  namespace: cloudforet
+spec:
+  ingressClassName: custom-nginx-2
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: console-api
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service-3
+  namespace: cloudforet
+spec:
+  ingressClassName: custom-nginx-3
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: console-api-v2-rest
+                port:
+                  number: 80
